@@ -1,0 +1,102 @@
+---
+title: Expo VoiceVox
+description: An expo module for VoiceVox
+platforms: ['android', 'ios']
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+<Callout title="Coming Soon" type="error">
+  Currently under development!
+</Callout>
+
+[VOICEVOX Core](https://github.com/VOICEVOX/voicevox_core) brought to React Native via Expo Modules.
+
+## What's VOICEVOX?
+VOICEVOX is an open source text-to-speech synthesizer created by Hiho. 
+
+For more information, visit these links:
+
+- [Official Site](https://voicevox.hiroshiba.jp/)
+- [Github](https://github.com/VOICEVOX)
+- [Wiki Article](https://vocalsynth.fandom.com/wiki/VOICEVOX) (English)
+
+## Install
+Not yet available.
+{/* ## Install
+
+```bash tab="npm"
+npm install @kuzulabz/expo-voicevox
+```
+
+```bash tab="pnpm"
+pnpm add @kuzulabz/expo-voicevox
+```
+
+```bash tab="yarn"
+yarn add @kuzulabz/expo-voicevox
+```
+
+```bash tab="bun"
+bun add @kuzulabz/expo-voicevox
+```
+For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing. */}
+
+
+## Usage
+<Steps>
+<Step>
+### Initialize
+```ts
+import ExpoVoicevox from "@kuzulabz/expo-voicevox";
+
+// A system URI must be passed. ex:  Expo-Filesystem
+const isSuccessful = await ExpoVoicevox.initialize(openJTalkDicDir, modelDir)
+```
+</Step>
+<Step>
+### Load Voice Model
+```ts
+import ExpoVoicevox from "@kuzulabz/expo-voicevox";
+
+// You can find the styleId by grabbing the models metadata
+const styleId = ExpoVoicevox.getMeta()[0]["styles"][0]["id"];
+
+const isSuccessful = await ExpoVoicevox.loadModel(styleId)
+```
+</Step>
+<Step>
+### Generate
+```ts
+import ExpoVoicevox from "@kuzulabz/expo-voicevox";
+
+const text = "無料で使える中品質なテキスト読み上げ";
+
+// Basic TTS usage
+const result = await ExpoVoicevox.tts(text, styleId)
+const wavUri = `data:audio/wav;base64,${result}`;
+
+// Advanced usage
+let audioQuery = await ExpoVoicevox.createAudioQuery(text, styleId);
+if (audioQuery) {
+    const result = await ExpoVoicevox.synthesis({
+        ...audioQuery, 
+        speed_scale: audioQuery.speed_scale * 0.5
+        }, speakerId);
+    const wavUri = `data:audio/wav;base64,${result}`;
+}
+```
+</Step>
+</Steps>
+
+## Models
+View the model licenses and the vvm info at [VOICEVOX/voicevox_vvm](https://github.com/VOICEVOX/voicevox_vvm)
+
+## Helpful Links
+These articles / repos helped me understand how to use the voicevox core on mobile platforms:
+
+#### Android
+- [VOICEVOX/voicevox_mobile](https://github.com/VOICEVOX/voicevox_mobile/blob/main/android/app/src/main/java/jp/hiroshiba/voicevox/CorePlugin.kt) kotlin code
+    - Without this, this project would have taken much longer. Please go give it a star!
+
+- [Article](https://qiita.com/mekusuri/items/fc32cd242e146d01bf5b) by [@mekusuri](https://qiita.com/mekusuri)

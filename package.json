@@ -10,12 +10,25 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "next": "15.5.4",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "fumadocs-ui": "15.8.0",
-    "fumadocs-core": "15.8.0",
-    "fumadocs-mdx": "12.0.1"
+    "@fortawesome/fontawesome-svg-core": "^7.0.1",
+    "@fortawesome/free-brands-svg-icons": "^7.0.1",
+    "@fortawesome/free-solid-svg-icons": "^7.0.1",
+    "@fortawesome/react-fontawesome": "^3.0.2",
+    "@orama/orama": "^3.1.16",
+    "@orama/tokenizers": "^3.1.16",
+    "@tsparticles/engine": "^3.9.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.9.1",
+    "class-variance-authority": "^0.7.1",
+    "fumadocs-core": "^16.0.7",
+    "fumadocs-mdx": "^13.0.4",
+    "fumadocs-ui": "^16.0.7",
+    "lucide-react": "^0.544.0",
+    "next": "^16.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "24.5.2",

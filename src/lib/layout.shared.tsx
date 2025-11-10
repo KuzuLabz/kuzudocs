@@ -1,4 +1,6 @@
-import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
+import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
+import { BookIcon, BookText } from "lucide-react";
+import Image from "next/image";
 
 /**
  * Shared layout configurations
@@ -9,22 +11,29 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
  */
 export function baseOptions(): BaseLayoutProps {
   return {
+    githubUrl: "https://github.com/KuzuLabz",
     nav: {
       title: (
         <>
-          <svg
-            width="24"
-            height="24"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-label="Logo"
-          >
-            <circle cx={12} cy={12} r={12} fill="currentColor" />
-          </svg>
-          My App
+          <Image src={"/favicon.png"} width={24} height={24} alt="logo" />
+          KuzuLabz
         </>
       ),
     },
     // see https://fumadocs.dev/docs/ui/navigation/links
-    links: [],
+    links: [
+      {
+        icon: <BookText />,
+        text: "Projects",
+        url: "/docs",
+      },
+      {
+        icon: <BookIcon />,
+        text: "Blog",
+        url: "/blog",
+        // secondary items will be displayed differently on navbar
+        secondary: false,
+      },
+    ],
   };
 }

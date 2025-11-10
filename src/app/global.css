@@ -1,3 +1,13 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/black.css';
 @import 'fumadocs-ui/css/preset.css';
+
+@theme {
+  --color-fd-primary: hsl(101, 90%, 30%);
+  --color-fd-primary-foreground: hsl(0, 0%, 98%);
+}
+
+.dark {
+  --color-fd-primary: hsl(101, 94%, 54%);
+  --color-fd-primary-foreground: hsl(0, 0%, 9%);
+}

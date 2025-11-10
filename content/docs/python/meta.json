@@ -1,0 +1,9 @@
+{
+    "title": "Python",
+    "description": "PIP packages",
+    "root": true,
+    "icon": "python",
+    "pages": [
+        "index"
+    ]
+}

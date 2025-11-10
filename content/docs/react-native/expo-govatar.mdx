@@ -1,0 +1,88 @@
+---
+title: Expo Govatar
+description: A react native port of Govatar
+platforms: ['android', 'apple', 'web']
+---
+
+import { GithubInfo } from 'fumadocs-ui/components/github-info';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+<GithubInfo
+  owner="KuzuLabz"
+  repo="expo-govatar"
+/>
+
+Generate funny avatars with [Govatar](https://github.com/o1egl/govatar).
+
+## Install
+```bash tab="npm"
+npm install @kuzulabz/expo-govatar
+```
+
+```bash tab="pnpm"
+pnpm add @kuzulabz/expo-govatar
+```
+
+```bash tab="yarn"
+yarn add @kuzulabz/expo-govatar
+```
+
+```bash tab="bun"
+bun add @kuzulabz/expo-govatar
+```
+For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
+
+### Web
+Web requires these extra steps:
+#### Metro Config
+Add ```config.resolver.assetExts.push('wasm');``` to your metro config file.
+
+#### Load WASM
+```typescript
+import { loadGovatarWeb, loadGovatarWebAsync } from '@kuzulabz/govatar';
+
+// for example, in App.tsx
+loadGovatarWeb();
+
+// or asyncronously
+await loadGovatarWebAsync();
+```
+
+## Usage
+[Full example](https://github.com/KuzuLabz/expo-govatar/blob/main/example/App.tsx)
+```ts
+import { generateAvatar } from '@kuzulabz/govatar';
+
+const username = 'KuzuLabz';
+const base64String = await generateAvatar({username});
+const imageUri = `data:image/png;base64,${base64String}`;
+```
+
+## API Reference
+
+### `generateAvatar(config)`
+Generate an avatar
+#### Parameters
+<TypeTable
+  type={{
+    username: {
+      type: 'string',
+      required: false,
+      description: 'A username or text.'
+    },
+    gender: {
+        type: 'MALE | FEMALE',
+        required: false,
+    }
+  }}
+/>
+#### Returns
+<TypeTable
+  type={{
+    Tokens: {
+      type: 'Promise<string>',
+      description: 'A base64 string',
+      required: true,
+    }
+  }}
+/>

@@ -1,0 +1,225 @@
+---
+title: Expo Kagome
+description: A react native port of Kagome
+platforms: ['android', 'apple', 'web']
+---
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import Link from 'next/link';
+import { GithubInfo } from 'fumadocs-ui/components/github-info';
+import { PlatformChip } from '../../../src/components/platform-chip'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faAndroid, faApple} from '@fortawesome/free-brands-svg-icons'
+import { Globe } from 'lucide-react';
+
+<GithubInfo
+  owner="KuzuLabz"
+  repo="expo-kagome"
+/>
+
+A react native port of [Kagome](https://github.com/ikawaha/kagome) using the IPA dictionary.
+
+## Install
+```bash tab="npm"
+npm install @kuzulabz/expo-kagome
+```
+
+```bash tab="pnpm"
+pnpm add @kuzulabz/expo-kagome
+```
+
+```bash tab="yarn"
+yarn add @kuzulabz/expo-kagome
+```
+
+```bash tab="bun"
+bun add @kuzulabz/expo-kagome
+```
+For bare React Native projects, you must ensure that you have [installed and configured the `expo` package](https://docs.expo.dev/bare/installing-expo-modules/) before continuing.
+
+### Web
+Web requires these extra steps:
+#### Metro Config
+Add ```config.resolver.assetExts.push('wasm');``` to your metro config file.
+
+#### Load WASM
+```typescript
+import { initializeKagome, initializeKagomeAsync } from '@kuzulabz/expo-kagome';
+
+// for example, in App.tsx
+initializeKagome();
+
+// or asyncronously
+await initializeKagomeAsync();
+```
+
+## Usage
+[Full example](https://github.com/KuzuLabz/expo-kagome/blob/main/example/App.tsx)
+```ts
+import { getTokens } from '@kuzulabz/expo-kagome';
+
+const text = '私は日本語を勉強しています。';
+const tokens = await getTokens(text);
+```
+
+## API Reference
+### `getTokens(text)`
+Basic tokenization
+#### Parameters
+<TypeTable
+  type={{
+    text: {
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
+#### Returns
+<TypeTable
+  type={{
+    Tokens: {
+      type: 'Promise<Token[]>',
+      required: true,
+      typeDescriptionLink: '#token'
+    }
+  }}
+/>
+
+### `getAnalysis(text, mode)`
+Same as getTokens, but with an additional mode parameter.
+#### Parameters
+<TypeTable
+  type={{
+    text: {
+      type: 'string',
+      required: true,
+    },
+    mode: {
+      description: 'The mode of analysis',
+      type: 'AnalyzeMode',
+      default: 'normal',
+      typeDescriptionLink: '#analyzemode'
+    }
+  }}
+/>
+#### Returns
+<TypeTable
+  type={{
+    Tokens: {
+      type: 'Promise<Token[]>',
+      required: true,
+      typeDescriptionLink: '#token'
+    }
+  }}
+/>
+
+### `getWakati(text)`
+Segmentation of text into words
+#### Parameters
+<TypeTable
+  type={{
+    text: {
+      type: 'string',
+      required: true,
+    }
+  }}
+/>
+#### Returns
+<TypeTable
+  type={{
+    Words: {
+      type: 'Promise<string[]>',
+      required: true,
+    }
+  }}
+/>
+
+### `getGraph(text, mode)`
+Generate a graph of the tokenization process in Graphvis dot format.
+#### Parameters
+<TypeTable
+  type={{
+    text: {
+      type: 'string',
+      required: true,
+    },
+    mode: {
+      description: 'The mode of analysis',
+      type: 'AnalyzeMode',
+      default: 'normal',
+      typeDescriptionLink: '#analyzemode'
+    }
+  }}
+/>
+#### Returns
+<TypeTable
+  type={{
+    Dot: {
+      type: 'Promise<string>',
+      required: true,
+      description: 'A Graphvis in dot format',
+    }
+  }}
+/>
+
+### Types
+#### Token
+<TypeTable
+  type={{
+    word_id: {
+      required: true,
+      type: 'number',
+      description: 'The ID of the token.',
+    },
+    word_position: {
+      required: true,
+      type: 'number',
+      description: 'The position of the token in the text.',
+    },
+    word_type: {
+      required: true,
+      type: 'string',
+      description: 'The word class.'
+    },
+    base_form: {
+      required: true,
+      type: 'string',
+      description: 'The base form of the token.'
+    },
+    surface_form: {
+      required: true,
+      type: 'string',
+      description: 'The surface form of the token.'
+    },
+    reading: {
+      required: true,
+      type: 'string',
+      description: 'The reading of the token.'
+    },
+    features: {
+      required: true,
+      type: 'string[]',
+      description: 'An array of features of the token. Each feature is a string.'
+    },
+    pos: {
+      required: true,
+      type: 'string[]',
+      description: 'The part of speech of the token.'
+    },
+    pronunciation: {
+      required: true,
+      type: 'string',
+      description: 'The pronunciation of the token.'
+    }
+  }}
+/>
+
+#### AnalyzeMode
+For more information about these modes, refer to the Kagome documentation.
+<TypeTable
+  type={{
+    AnalyzeMode: {
+      required: true,
+      type: 'normal  | search | extend',
+    }
+  }}
+/>

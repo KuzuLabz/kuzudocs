@@ -1,0 +1,9 @@
+{
+    "title": "Games",
+    "description": "Fun software / demos",
+    "root": true,
+    "icon": "gamepad",
+    "pages": [
+        "index"
+    ]
+}
