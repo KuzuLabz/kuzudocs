@@ -13,6 +13,8 @@ import { TypeTable } from 'fumadocs-ui/components/type-table';
 
 [Mecab](https://github.com/shogo82148/mecab) brought to React Native via [Nitro Modules](https://nitro.margelo.com/).
 
+Currently supports IPADIC and UNIDIC. For other dictionaries, refer to the [initialize function](#initialize-1).
+
 ## Install
 
 ```bash tab="npm"
@@ -66,6 +68,11 @@ nodes[0].cost;
 ### Setup
 #### initialize
 Initializes Mecab by loading the dictionary and creating a tagger.
+
+`Unsupported Dictionaries` - Set dictType to 'unknown'. Tokens may be incorrect with this dictType. 
+
+The parseToNode() with a custom feature parser is recommended for unsupported formats. 
+For official support, please send a PR or create an issue that includes the feature order.
 ```ts
 await Mecab.initialize("file://...", "ipadic");
 ```
