@@ -323,14 +323,14 @@ export const config: ISourceOptions = {
             "options": {
                 "image": [
                     {
-                        "src": "https://github.com/SmashinFries/VNBrowser/blob/master/assets/favicon.png?raw=true",
+                        "src": "https://raw.githubusercontent.com/SmashinFries/VNBrowser/refs/heads/master/assets/favicon.png",
                         "gif": false,
                         "height": 32,
                         "name": "app1",
                         "width": 32
                     },
                     {
-                        "src": "https://github.com/KuzuLabz/WaifuTagger/blob/master/assets/favicon.png?raw=true",
+                        "src": "https://raw.githubusercontent.com/KuzuLabz/WaifuTagger/refs/heads/master/assets/favicon.png",
                         "gif": false,
                         "height": 32,
                         "name": "app2",
@@ -344,7 +344,7 @@ export const config: ISourceOptions = {
                         "width": 32
                     },
                     {
-                        "src": "https://github.com/SmashinFries/GorakuPlus/blob/master/assets/iconsv3/adaptive-icon.png?raw=true",
+                        "src": "https://raw.githubusercontent.com/SmashinFries/GorakuPlus/refs/heads/master/assets/iconsv3/adaptive-icon.png",
                         "gif": false,
                         "height": 72,
                         "name": "app4",
