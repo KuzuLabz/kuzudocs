@@ -1,0 +1,444 @@
+---
+title: Mecab
+description: A react native port of Mecab
+platforms: ['android', 'ios']
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+<Callout title="Coming Soon" type="error">
+  Currently preparing for release!
+</Callout>
+
+[Mecab](https://github.com/shogo82148/mecab) brought to React Native via [Nitro Modules](https://nitro.margelo.com/).
+
+## Install
+
+```bash tab="npm"
+npm install @kuzulabz/react-native-nitro-mecab react-native-nitro-modules
+```
+
+```bash tab="pnpm"
+pnpm add @kuzulabz/react-native-nitro-mecab react-native-nitro-modules
+```
+
+```bash tab="yarn"
+yarn add @kuzulabz/react-native-nitro-mecab react-native-nitro-modules
+```
+
+```bash tab="bun"
+bun add @kuzulabz/react-native-nitro-mecab react-native-nitro-modules
+```
+
+## Usage
+<Steps>
+<Step>
+### Initialize
+```ts
+import { Mecab } from '@kuzulabz/react-native-nitro-mecab';
+
+await Mecab.initialize('file:///path/to/dict/directory', 'ipadic');
+```
+</Step>
+<Step>
+### Tokenize
+```ts
+import { Mecab, Token } from '@kuzulabz/react-native-voicevox';
+
+const text = "すもももももももものうち";
+
+// Tokenize
+const tokens: Token[] = Mecab.tokenize(text);
+tokens[0].surface;
+
+// Segment
+const words: string[] = Mecab.wakati(text);
+
+// Advanced usage
+const nodes = Mecab.parseToNodes(text);
+nodes[0].cost;
+```
+</Step>
+</Steps>
+
+## API Reference
+### Setup
+#### initialize
+Initializes Mecab by loading the dictionary and creating a tagger.
+```ts
+await Mecab.initialize("file://...", "ipadic");
+```
+<TypeTable 
+    type={{
+        dictUri: {
+            type: 'string',
+            required: true,
+            description: 'The local uri of the dictionary directory ("file://...").'
+        },
+        dictFormat: {
+            type: 'DictFormat',
+            required: true,
+            description: 'The format of dictionary.',
+            typeDescriptionLink: '#dictformat'
+        },
+        userDictUris: {
+            type: 'string[]',
+            required: false,
+            description: "An array of user dictionary directory uri's."
+        }
+    }}
+/>
+
+#### deinitialize
+Unloads the dictionary and destroys the tagger. Useful for changing dictionary or loading new user dictionaries.
+```ts
+Mecab.deinitialize();
+```
+
+#### getIsInitialized
+Check if Mecab is ready.
+```ts
+const isInitialized = Mecab.getIsInitialized();
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'boolean',
+            required: true
+        }
+    }} 
+/>
+
+### Core
+#### tokenize
+Tokenize a japanese sentence.
+```ts
+const tokens = Mecab.tokenize("すもももももももものうち");
+tokens[0].surface
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+        },
+        returns: { type: 'Token[]', required: true, typeDescriptionLink: '#token' }
+    }}
+/>
+
+#### wakati
+Segments/splits the japanese text by word.
+```ts
+const words = Mecab.wakati("すもももももももものうち");
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+        },
+        returns: { type: 'string[]', required: true }
+    }}
+/>
+
+#### parseToNodes
+Parses the japanese text into Mecab Nodes. 
+```ts
+const nodes = Mecab.parseToNodes("すもももももももものうち", true);
+nodes[0].cost
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+        },
+        tokenize: {
+            type: 'boolean',
+            required: false,
+            default: 'false',
+            description: 'Feature field returns a Token, otherwise a raw string.'
+        },
+        skipBosEos: {
+            type: 'boolean',
+            required: false,
+            default: 'true',
+            description: 'Filters out the BOS and EOS nodes.'
+        },
+        returns: { type: 'NodeToken | Node', required: true, typeDescriptionLink: '#node' }
+    }}
+/>
+
+#### getLattice
+Parses the sentence into tokens with nbest results.
+```ts
+const lattice = await Mecab.getLattice("すもももももももものうち", 2);
+lattice[0] // first set of tokens results
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+        },
+        nBest: {
+            type: 'number',
+            required: false,
+            default: '2',
+            description: 'The x amount of best results.'
+        },
+        returns: { 
+            type: 'Promise<Token[][]>',
+            required: true,
+            description: "An array of Token groupings", 
+            typeDescriptionLink: '#token' 
+        }
+    }}
+/>
+
+### Utils
+#### getDictionaryInfo
+Get information about the loaded dictionary.
+```ts
+const dictInfo = Mecab.getDictionaryInfo();
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'DictionaryInfo',
+            required: true,
+            typeDescriptionLink: '#dictionaryinfo'
+        }
+    }}
+/>
+
+#### getVersion
+Gets the Mecab version.
+```ts
+const version = Mecab.getVersion();
+```
+<TypeTable 
+    type={{
+        returns: { type: 'string', returns: true }
+    }}
+/>
+
+#### translatePos
+Translates the POS tag to english.
+```ts
+const engTag = translatePos("名詞"); // noun
+```
+<TypeTable 
+    type={{
+        tag: {
+            type: 'string',
+            required: true,
+        },
+        returns: { 
+            type: 'string',
+            required: true,
+            description: "The translated tag or the input if not available."
+        }
+    }}
+/>
+
+## Types
+### Token
+<TypeTable
+  type={{
+    surface: {
+      required: true,
+      type: 'string',
+      description: 'The original word.',
+    },
+    baseForm: {
+        required: true,
+        type: 'string',
+        description: 'The base form.'
+    },
+    reading: {
+        required: true,
+        type: 'string',
+        description: 'The katakana form.'
+    },
+    pronunciation: {
+        required: true,
+        type: 'string',
+        description: 'The pronunciation form.'
+    },
+    conjugation: {
+        required: true,
+        type: 'Conjugation',
+        typeDescriptionLink: '#conjugation'
+    },
+    pos: {
+        required: true,
+        type: '[string, string, string, string]',
+        description: 'The parts of speech from 1-4.'
+    }
+  }}
+/>
+
+### Node
+<TypeTable 
+    type={{
+        id: {
+            required: true,
+            type: 'number',
+        },
+        charType: {
+            required: true,
+            type: 'string',
+            description: 'Character type.',
+        },
+        cost: {
+            required: true,
+            type: 'number',
+            description: 'Best accumulative cost from bos node to this node.'
+        },
+        wordCost: {
+            required: true,
+            type: 'string',
+        },
+        feature: {
+            required: true,
+            type: 'string',
+        },
+        isBest: {
+            required: true,
+            type: 'boolean',
+            description: 'Is best node?'
+        },
+        rcAttr: {
+            required: true,
+            type: 'number',
+            description: 'Right attribute id.'
+        },
+        lcAttr: {
+            required: true,
+            type: 'number',
+            description: 'Left attribute id.'
+        },
+        length: {
+            required: true,
+            type: 'string',
+            description: 'Length of the surface form.'
+        },
+        rLength: {
+            required: true,
+            type: 'number',
+            description: 'Length of the surface form including white space before the morph.'
+        },
+        posId: {
+            required: true,
+            type: 'number',
+            description: 'The pronunciation form.'
+        },
+        surface: {
+            required: true,
+            type: 'string',
+            description: 'Unique part of speech id.'
+        },
+        status: {
+            required: true,
+            type: 'NodeStatus',
+            typeDescriptionLink: '#nodestatus'
+        },
+    }}
+/>
+
+### NodeToken
+Same as Node but feature property is a Token.
+
+### Conjugation
+<TypeTable 
+    type={{
+        type: {
+            required: true,
+            type: 'string',
+        },
+        form: {
+            required: true,
+            type: 'string',
+        }
+    }}
+/>
+
+### NodeStatus
+<TypeTable 
+    type={{
+        Object: {
+            type: "'normal' | 'unknown' | 'bos' | 'eos' | 'eon'"
+        }
+    }}
+/>
+
+### DictionaryInfo
+<TypeTable 
+    type={{
+        charset: {
+            type: 'string',
+            required: true,
+            description: 'Character set of the dictionary.'
+        },
+        filename: {
+            type: 'string',
+            required: true,
+            description: 'Filename of dictionary.'
+        },
+        rSize: {
+            type: 'number',
+            required: true,
+            description: 'Right attributes size.'
+        },
+        lSize: {
+            type: 'number',
+            required: true,
+            description: 'Left attributes size.'
+        },
+        size: {
+            type: 'number',
+            required: true,
+            description: 'How many words are registered in this dictionary.'
+        },
+        type: {
+            type: 'DictionaryInfoType',
+            required: true,
+            typeDescriptionLink: '#dictionaryinfotype'
+        },
+        version: {
+            type: 'number',
+            required: true,
+            description: 'Version of this dictionary.'
+        }
+    }}
+/>
+
+### DictionaryInfoType
+<TypeTable 
+    type={{
+        string: {
+            type: "'userdic' | 'sysdic'| 'unknown'",
+            required: true
+        }
+    }}
+/>
+
+### DictFormat
+<TypeTable 
+    type={{
+        string: {
+            type: "'ipadic' | 'unidic' | 'unknown' | 'none'",
+            required: true
+        }
+    }}
+/>
+
+## Dictionaries
+
+#### IPADIC
+Available in [releases](https://github.com/KuzuLabz/react-native-nitro-mecab/releases).
+
+#### UNIDIC
+Unidic an be found at the [official website](https://clrd.ninjal.ac.jp/unidic/).
