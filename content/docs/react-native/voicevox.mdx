@@ -1,0 +1,1202 @@
+---
+title: Voicevox
+description: An unoffical React Native Nitro port of VOICEVOX
+platforms: ['android', 'ios']
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+<Callout title="Coming Soon" type="error">
+  Currently in the testing phase!
+</Callout>
+
+<Callout title="Android - 16KB Page Size" type="warn">
+  16KB page size is not yet suppported. Once VOICEVOX Onnxruntime 1.23.2 is released, this package will be updated.
+</Callout>
+
+[VOICEVOX Core](https://github.com/VOICEVOX/voicevox_core) brought to React Native via [Nitro Modules](https://nitro.margelo.com/).
+
+## What's VOICEVOX?
+VOICEVOX is an open source text-to-speech synthesizer created by [Hiroshiba](https://github.com/Hiroshiba) and the [VOICEVOX team](https://github.com/orgs/VOICEVOX/people).
+
+For more information, visit these links:
+
+- [Official Site](https://voicevox.hiroshiba.jp/)
+- [VOICEVOX Github](https://github.com/VOICEVOX)
+- [Wiki Article](https://vocalsynth.fandom.com/wiki/VOICEVOX) (English)
+
+## Install
+Coming soon!
+{/* ```bash tab="npm"
+npm install @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
+```
+
+```bash tab="pnpm"
+pnpm add @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
+```
+
+```bash tab="yarn"
+yarn add @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
+```
+
+```bash tab="bun"
+bun add @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
+``` */}
+
+## Usage
+### Text-to-Speech
+<Steps>
+<Step>
+#### Initialize
+```ts
+import { Voicevox } from '@kuzulabz/react-native-nitro-voicevox';
+
+await Voicevox.initialize('file:///path/to/OpenJtalkDict/directory');
+```
+</Step>
+<Step>
+#### Load Voice Model
+```ts
+import { Voicevox, openVoiceModelFile } from '@kuzulabz/react-native-nitro-voicevox';
+
+const voiceModelFile = await openVoiceModelFile('path/to/your/model.vvm');
+
+await Voicevox.loadModel(voiceModelFile);
+```
+</Step>
+<Step>
+#### Generate
+```ts
+import { Voicevox } from '@kuzulabz/react-native-nitro-voicevox';
+
+const text = "こんにちは世界！";
+
+const metas = await Voicevox.getMetas();
+const styleId = metas[0].styles[0].id;
+
+// Basic TTS usage
+// Outputs either an ArrayBuffer or a base64 string (ex: data:audio/wav;base64,...)
+const base64Uri = await Voicevox.tts(text, styleId, {format: 'base64'});
+
+// Advanced usage
+let audioQuery = Voicevox.createAudioQuery(text, styleId);
+audioQuery.pitch_scale += 0.1; // Modify parameters as needed
+
+const wavArrayBuffer = await Voicevox.synthesis(audioQuery, 1, {format: 'arraybuffer', enableInterrogativeUpspeak: true});
+```
+</Step>
+</Steps>
+
+### Song
+<Steps>
+<Step>
+#### Initialize
+```ts
+import { Voicevox } from '@kuzulabz/react-native-nitro-voicevox';
+
+await Voicevox.initialize('file:///path/to/OpenJtalkDict/directory');
+```
+</Step>
+<Step>
+#### Load Voice Models
+```ts
+import { Voicevox, openVoiceModelFile } from '@kuzulabz/react-native-voicevox';
+
+// As of 0.16.3 model release, the model called s0.vvm contains song specific voices.
+const songVoiceModel = await openVoiceModelFile('path/to/song/model/s0.vvm');
+
+// Optional. Most voices should work as a singer (sing / frame_decode type).
+const voiceModel = await openVoiceModelFile('path/to/your/model.vvm');
+
+await Voicevox.loadModel(songVoiceModel);
+await Voicevox.loadModel(voiceModelFile);
+```
+</Step>
+<Step>
+#### Sing
+```ts
+import { Voicevox, Score } from '@kuzulabz/react-native-voicevox';
+
+const SINGING_TEACHER = 6000;
+const SINGER = 3000;
+
+const score: Score = {
+    notes: [
+        { key: null, frameLength: 15, lyric: "" },
+        { key: 60, frameLength: 45, lyric: "ド" },
+        { key: 62, frameLength: 45, lyric: "レ" },
+        { key: 64, frameLength: 45, lyric: "ミ" },
+        { key: null, frameLength: 15, lyric: "" },
+    ]
+};
+
+const frameAudioQuery = Voicevox.createSingFrameAudioQuery(score, SINGING_TEACHER);
+const wavArrayBuffer = await Voicevox.frameSynthesis(frameAudioQuery, SINGER, 'arraybuffer');
+```
+</Step>
+</Steps>
+
+## Models
+View the models and licenses at [VOICEVOX/voicevox_vvm](https://github.com/VOICEVOX/voicevox_vvm)
+
+
+## API Reference
+### Setup
+#### initialize
+Initialize OpenJTalk, Onnxruntime, and synthesizer.
+
+```ts
+await Voicevox.initialize("file://...", "ipadic");
+```
+<TypeTable 
+    type={{
+        openJTalkUri: {
+            type: 'string',
+            required: true,
+            description: 'The OpenJTalk directory uri (must contain the dict files as children)'
+        }
+    }}
+/>
+
+#### deinitialize
+Free the resources used.
+```ts
+Voicevox.deinitialize();
+```
+
+#### getIsInitialized
+Check if synthesizer is initialized.
+```ts
+const isInitialized = Voicevox.getIsInitialized();
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'boolean',
+            required: true
+        }
+    }} 
+/>
+
+### Models
+#### loadVoiceModel
+Load the voice model.
+
+```ts
+await Voicevox.loadVoiceModel('file:///path/to/model.vvm');
+```
+<TypeTable 
+    type={{
+        voiceModel: {
+            type: 'object',
+            required: true,
+            description: 'A {@linkcode VoiceModelFile} object.'
+        }
+    }} 
+/>
+
+#### getIsVoiceModelLoaded
+Check if voice model is loaded.
+
+```ts
+const isLoaded = Voicevox.getIsVoiceModelLoaded(id);
+```
+<TypeTable 
+    type={{
+        id: {
+            type: 'string',
+            required: true,
+            description: 'The uuid string of the voice model.'
+        },
+        returns: {
+            type: 'boolean',
+            required: true
+        }
+    }} 
+/>
+
+#### unloadVoiceModel
+Unloads the voice model.
+
+```ts
+await Voicevox.unloadVoiceModel(id);
+```
+<TypeTable 
+    type={{
+        id: {
+            type: 'string',
+            required: true,
+            description: 'The uuid string of the voice model.'
+        },
+    }} 
+/>
+
+#### getMetas
+Get the loaded character metas.
+
+```ts
+const metas = await Voicevox.getMetas();
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'CharacterMeta[]',
+            typeDescriptionLink: '#charactermeta',
+            required: true
+        },
+    }} 
+/>
+
+### Synth
+#### createAudioQuery
+Create an AudioQuery object.
+
+```ts
+let audioQuery = Voicevox.createAudioQuery("こんにちは", 2);
+audioQuery.speedScale += 0.1;
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+            description: 'Japanese text.'
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AudioQuery',
+            typeDescriptionLink: '#audioquery',
+            required: true
+        },
+    }} 
+/>
+
+#### createAudioQueryFromKana
+Create an AudioQuery object using AquesTalk notation. 
+
+```ts
+let audioQueryKana = Voicevox.createAudioQueryFromKana("コンニチワ", 2);
+audioQueryKana.speedScale += 0.1;
+```
+<TypeTable 
+    type={{
+        kana: {
+            type: 'string',
+            required: true,
+            description: 'Kana text.'
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AudioQuery',
+            typeDescriptionLink: '#audioquery',
+            required: true
+        },
+    }} 
+/>
+
+#### createAccentPhrases
+Creates accent phrases.
+
+```ts
+const accentPhrases = Voicevox.createAccentPhrases("こんにちは", 2);
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+            description: 'Japanese text.'
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AccentPhrase[]',
+            typeDescriptionLink: '#accentphrase',
+            required: true
+        },
+    }} 
+/>
+
+#### createAccentPhrasesFromKana
+Creates accent phrases using AquesTalk notation.
+
+```ts
+const accentPhrasesKana = Voicevox.createAccentPhrasesFromKana("こんにちは", 2);
+```
+<TypeTable 
+    type={{
+        kana: {
+            type: 'string',
+            required: true,
+            description: 'Kana text.'
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AccentPhrase[]',
+            typeDescriptionLink: '#accentphrase',
+            required: true
+        },
+    }} 
+/>
+
+#### replaceMoraData
+Replaces the pitch and phoneme length of the AccentPhrase array with a specific voice.
+
+```ts
+const result = Voicevox.replaceMoraData(accentPhrases, 4);
+```
+<TypeTable 
+    type={{
+        accentPhrases: {
+            type: 'AccentPhrase[]',
+            required: true,
+            typeDescriptionLink: '#accentphrase',
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AccentPhrase[]',
+            typeDescriptionLink: '#accentphrase',
+            required: true
+        },
+    }} 
+/>
+
+#### replaceMoraPitch
+Replaces the pitch of an AccentPhrase array with a specific voice.
+
+```ts
+const result = Voicevox.replaceMoraPitch(accentPhrases, 4);
+```
+<TypeTable 
+    type={{
+        accentPhrases: {
+            type: 'AccentPhrase[]',
+            required: true,
+            typeDescriptionLink: '#accentphrase',
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AccentPhrase[]',
+            typeDescriptionLink: '#accentphrase',
+            required: true
+        },
+    }} 
+/>
+
+#### replacePhonemeLength
+Replaces the phoneme length of the AccentPhrase array with a specific voice.
+
+```ts
+const result = Voicevox.replacePhonemeLength(accentPhrases, 4);
+```
+<TypeTable 
+    type={{
+        accentPhrases: {
+            type: 'AccentPhrase[]',
+            required: true,
+            typeDescriptionLink: '#accentphrase',
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        returns: {
+            type: 'AccentPhrase[]',
+            typeDescriptionLink: '#accentphrase',
+            required: true
+        },
+    }} 
+/>
+
+#### synthesis
+Synthesize speech from AudioQuery.
+
+```ts
+const wavArrayBuffer = await Voicevox.synthesis(audioQuery, 2, { format: 'arraybuffer' });
+```
+<TypeTable 
+    type={{
+        audioQuery: {
+            type: 'AudioQuery',
+            required: true,
+            typeDescriptionLink: '#audioquery',
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        options: {
+            type: 'AudioOptions',
+            typeDescriptionLink: '#audiooptions'
+        },
+        returns: {
+            type: 'string | ArrayBuffer',
+            required: true,
+            description: 'A base64 uri or an ArrayBuffer of a wav audio file.'
+        },
+    }} 
+/>
+
+#### tts
+Synthesize speech from japanese text.
+
+```ts
+const base64Uri = await Voicevox.tts("こんにちは", 2);
+// base64Uri = "data:audio/wav;base64,..."
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+            description: 'Japanese text.'
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        options: {
+            type: 'AudioOptions',
+            typeDescriptionLink: '#audiooptions'
+        },
+        returns: {
+            type: 'string | ArrayBuffer',
+            required: true,
+            description: 'A base64 uri or an ArrayBuffer of a wav audio file.'
+        },
+    }} 
+/>
+
+#### ttsFromKana
+Synthesize speech from kana text using AquesTalk notation.
+
+```ts
+const base64Uri = await Voicevox.ttsFromKana("コンニチワ", 2);
+// base64Uri = "data:audio/wav;base64,..."
+```
+<TypeTable 
+    type={{
+        kana: {
+            type: 'string',
+            required: true,
+            description: 'Kana text.'
+        },
+        styleId: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        options: {
+            type: 'AudioOptions',
+            typeDescriptionLink: '#audiooptions'
+        },
+        returns: {
+            type: 'string | ArrayBuffer',
+            required: true,
+            description: 'A base64 uri or an ArrayBuffer of a wav audio file.'
+        },
+    }} 
+/>
+
+### Song
+[Song Documentation](https://github.com/VOICEVOX/voicevox_core/blob/main/docs/guide/user/song.md)
+
+#### createSingFrameAudioQuery
+Create a singing audio frame query
+
+```ts
+const teacher = 6000;
+const frameAudioQuery = Voicevox.createSingFrameAudioQuery(score, teacher);
+```
+<TypeTable 
+    type={{
+        score: {
+            type: 'score',
+            required: true,
+            typeDescriptionLink: '#score'
+        },
+        styleId: {
+            type: 'styleId',
+            required: true,
+            typeDescriptionLink: '#styleid',
+            description: 'The singing teacher style id of the speaker.'
+        },
+        returns: {
+            type: 'FrameAudioQuery',
+            required: true,
+            typeDescriptionLink: '#frameaudioquery'
+        },
+    }} 
+/>
+
+#### createSingFrameF0
+Generate frame-by-frame fundamental frequency from the singing frame audio query.
+
+```ts
+const teacher = 6000;
+const frameF0 = Voicevox.createSingFrameF0(score, frameAudioQuery, teacher);
+```
+<TypeTable 
+    type={{
+        score: {
+            type: 'score',
+            required: true,
+            typeDescriptionLink: '#score'
+        },
+        frameAudioQuery: {
+            type: 'FrameAudioQuery',
+            required: true,
+            typeDescriptionLink: '#frameaudioquery'
+        },
+        styleId: {
+            type: 'styleId',
+            required: true,
+            typeDescriptionLink: '#styleid',
+            description: 'The singing teacher style id of the speaker.'
+        },
+        returns: {
+            type: 'number[]',
+            required: true,
+            description: 'Fundamental frequency per frame.'
+        },
+    }} 
+/>
+
+#### createSingFrameVolume
+Generate frame-by-frame volume from the singing frame audio query.
+
+```ts
+const teacher = 6000;
+const frameVolume = Voicevox.createSingFrameVolume(score, frameAudioQuery, teacher);
+```
+<TypeTable 
+    type={{
+        score: {
+            type: 'score',
+            required: true,
+            typeDescriptionLink: '#score'
+        },
+        frameAudioQuery: {
+            type: 'FrameAudioQuery',
+            required: true,
+            typeDescriptionLink: '#frameaudioquery'
+        },
+        styleId: {
+            type: 'styleId',
+            required: true,
+            typeDescriptionLink: '#styleid',
+            description: 'The singing teacher style id of the speaker.'
+        },
+        returns: {
+            type: 'number[]',
+            required: true,
+            description: 'Volume per frame.'
+        },
+    }} 
+/>
+
+#### frameSynthesis
+Perform singing voice synthesis.
+
+```ts
+const singer = 3000;
+const base64Uri = await Voicevox.frameSynthesis(frameAudioQuery, singer);
+```
+<TypeTable 
+    type={{
+        frameAudioQuery: {
+            type: 'FrameAudioQuery',
+            required: true,
+            typeDescriptionLink: '#frameaudioquery'
+        },
+        styleId: {
+            type: 'styleId',
+            required: true,
+            typeDescriptionLink: '#styleid',
+            description: 'The singer style id of the speaker.'
+        },
+        format: {
+            type: 'AudioEncoding',
+            typeDescriptionLink: '#audioencoding'
+        },
+        returns: {
+            type: 'string | arraybuffer',
+            required: true,
+            description: 'A base64 uri or an ArrayBuffer of a wav audio file.'
+        },
+    }} 
+/>
+
+### Utils
+#### setUserDict
+Configure the user dictionary used by OpenJtalk.
+
+*Call this method again after any changes to the UserDict.*
+
+```ts
+const userDict = createUserDict();
+Voicevox.setUserDict(userDict);
+```
+<TypeTable 
+    type={{
+        userDict: {
+            type: 'UserDict',
+            required: true,
+            typeDescriptionLink: '#userdict'
+        }
+    }} 
+/>
+
+#### analyze
+Parse Japanese text using OpenJTalk.
+
+```ts
+const accentPhrases = Voicevox.analyze('こんにちは');
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+            description: 'Japanese text.'
+        },
+        returns: {
+            type: 'AccentPhrase[]',
+            required: true,
+            typeDescriptionLink: '#accentphrase'
+        },
+    }} 
+/>
+
+#### getSupportedDevices
+Get the onnxruntime supported devices. 
+
+```ts
+const devices = Voicevox.getSupportedDevices();
+devices.cpu // true
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'SupportedDevices',
+            required: true,
+            typeDescriptionLink: '#supporteddevices'
+        },
+    }} 
+/>
+
+### Voice Model File
+#### openVoiceModelFile
+Creates a VoiceModelFile instance.
+
+```ts
+import { openVoiceModelFile } from '@kuzulabz/react-native-nitro-voicevox';
+
+const voiceModel = await openVoiceModelFile("file://...");
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'VoiceModelFile',
+            required: true,
+            typeDescriptionLink: '#voicemodelfile'
+        },
+    }} 
+/>
+
+#### VoiceModelFile
+The VoiceModelFile class.
+
+```ts
+const voiceModel = await openVoiceModelFile("file://...");
+const metas = voiceModel.metas;
+
+voiceModel.close();
+```
+<TypeTable 
+    type={{
+        id: {
+            type: 'string',
+            required: true,
+            description: 'The UUID of the file.'
+        },
+        metas: {
+            type: 'CharacterMeta[]',
+            required: true,
+            description: 'An array of all the character metadata.',
+            typeDescriptionLink: '#charactermeta'
+        },
+        'dispose()': {
+            type:  'function',
+            required: true,
+            description: 'Deletes the instance.'
+        }
+    }}
+/>
+
+### User Dictionary
+#### createUserDict
+Create a new UserDict instance.
+
+```ts
+import { createUserDict } from '@kuzulabz/react-native-nitro-voicevox';
+
+const userDict = createUserDict();
+```
+<TypeTable 
+    type={{
+        returns: {
+            type: 'UserDict',
+            required: true,
+            typeDescriptionLink: '#userdict'
+        },
+    }} 
+/>
+
+#### UserDict
+The UserDict class.
+
+```ts
+const userDict = createUserDict();
+const words = await userDict.getWords();
+```
+<TypeTable 
+    type={{
+        'addWord(word)': {
+            type: 'function',
+            required: true,
+            description: 'Adds a word to the user dictionary.',
+            parameters: [{name: 'word', description: 'The word to add (UserDictWordInput)'}],
+            returns: 'string'
+        },
+        'updateWord(id, word)': {
+            type: 'function',
+            required: true,
+            description: 'Updates a word in the user dictionary.',
+            parameters: [
+                {
+                    name: 'id',
+                    description: 'The word id (string)'
+                },
+                {
+                    name: 'word',
+                    description: 'The modified word (UserDictWordInput)'
+                }
+            ]
+        },
+        'removeWord(id)': {
+            type: 'function',
+            required: true,
+            description: 'Removes the word from the user dictionary.',
+            parameters: [{ name: 'id', description: 'The word id (string)' }],
+        },
+        'getWords()': {
+            type: 'async function',
+            required: true,
+            description: 'Get all the words from this user dictionary.',
+            returns: 'UserDictWord[]'
+        },
+        'load(uri)': {
+            type: 'async function',
+            required: true,
+            description: 'Loads a user dictionary from a file.',
+            parameters: [{ name: 'url', description: 'The file URI of a saved user dictionary (string)' }]
+        },
+        'save(uri)': {
+            type: 'async function',
+            required: true,
+            description: 'Saves the current user dictionary to file.',
+            parameters: [{name: 'uri', description: 'The file URI destination to save to (string)' }]
+        },
+        'importDict(other)': {
+            type: 'async function',
+            required: true,
+            description: 'Imports the user dictionary from a UserDict object.',
+            parameters: [{ name: 'other', description: 'This UserDict instance' }]
+        }
+    }}
+/>
+
+## Types
+### AccentPhrase
+<TypeTable
+    type={{
+        moras: {
+            type: 'Mora[]',
+            required: true,
+            typeDescriptionLink: '#mora'
+        },
+        accent: {
+            type: 'number',
+            required: true
+        },
+        pauseMora: {
+            type: 'Mora',
+            typeDescriptionLink: '#mora'
+        },
+        isInterrogative: {
+            type: 'boolean',
+            required: true
+        }
+    }}
+/>
+
+### AudioQuery
+<TypeTable 
+    type={{
+        accentPhrases: {
+            type: 'AccentPhrase[]',
+            required: true,
+            typeDescriptionLink: '#accentphrase',
+        },
+        speedScale: {
+            type: 'number',
+            required: true
+        },
+        pitchScale: {
+            type: 'number',
+            required: true
+        },
+        intonationScale: {
+            type: 'number',
+            required: true
+        },
+        volumeScale: {
+            type: 'number',
+            required: true
+        },
+        prePhonemeLength: {
+            type: 'number',
+            required: true
+        },
+        postPhonemeLength: {
+            type: 'number',
+            required: true
+        },
+        outputSamplingRate: {
+            type: 'number',
+            required: true
+        },
+        outputStereo: {
+            type: 'boolean',
+            required: true
+        },
+        kana: {
+            type: 'string'
+        }
+    }}
+/>
+
+### Mora
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true
+        },
+        vowel: {
+            type: 'string',
+            required: true
+        },
+        vowelLength: {
+            type: 'number',
+            required: true
+        },
+        pitch: {
+            type: 'number',
+            required: true
+        },
+        consonant: {
+            type: 'string'
+        },
+        consonantLength: {
+            type: 'number'
+        }
+    }}
+/>
+
+### StyleId
+<TypeTable 
+    type={{
+        number: {
+            type: 'The style id of the speaker',
+            typeDescriptionLink: '#stylemeta',
+            required: true
+        }
+    }}
+/>
+
+### FrameAudioQuery
+<TypeTable 
+    type={{
+        f0: {
+            type: 'number[]',
+            required: true,
+            description: 'Fundamental frequency per frame.'
+        },
+        volume: {
+            type: 'number[]',
+            required: true,
+            description: 'Volume per frame.'
+        },
+        phonemes: {
+            type: 'FramePhoneme',
+            required: true,
+            description: 'List of phonemes.'
+        },
+        volumeScale: {
+            type: 'number',
+            required: true,
+            description: 'Overall volume.'
+        },
+        outputSamplingRate: {
+            type: 'number',
+            required: true,
+            description: 'Output sampling rate of the speech data.'
+        },
+        outputStereo: {
+            type: 'boolean',
+            required: true,
+            description: 'Whether or not to output audio data in stereo.'
+        }
+    }}
+/>
+
+### FramePhoneme
+<TypeTable 
+    type={{
+        phoneme: {
+            type: 'string',
+            required: true
+        },
+        frameLength: {
+            type: 'number',
+            required: true
+        },
+        noteId: {
+            type: 'number | null',
+            required: true
+        }
+    }}
+/>
+
+### Note
+<TypeTable 
+    type={{
+        frameLength: {
+            type: 'number',
+            required: true,
+            description: 'Frame length of the note.',
+            typeDescription: 'The number of seconds is multiplied by 93.75 and the fraction is adjusted to make it an integer.'
+        },
+        lyric: {
+            type: 'string',
+            required: true,
+            description: 'Hiragana / katakana that represent one mora. For rests, use an empty string.'
+        },
+        key: {
+            type: 'number | null',
+            description: 'Scale with MIDI note number (C4 = 60). For rests, use null or undefined'
+        },
+        noteId: {
+            type: 'number | null'
+        }
+    }}
+/>
+
+### Score
+Sheet music information.
+<TypeTable 
+    type={{
+        notes: {
+            type: 'Note[]',
+            required: true,
+            typeDescriptionLink: '#note'
+        }
+    }}
+/>
+
+### CharacterMeta
+<TypeTable 
+    type={{
+        name: {
+            type: 'string',
+            required: true
+        },
+        styles: {
+            type: 'StyleMeta[]',
+            required: true,
+            typeDescriptionLink: '#stylemeta'
+        },
+        speakerUuid: {
+            type: 'string',
+            required: true
+        },
+        version: {
+            type: 'string',
+            required: true
+        },
+        order: {
+            type: 'number'
+        }
+    }}
+/>
+
+### StyleMeta
+<TypeTable 
+    type={{
+        id: {
+            type: 'StyleId',
+            required: true,
+            typeDescriptionLink: '#styleid'
+        },
+        name: {
+            type: 'string',
+            required: true
+        },
+        type: {
+            type: 'string',
+            required: true
+        },
+        order: {
+            type: 'number',
+        }
+    }}
+/>
+
+### UserDictWordInflection
+<TypeTable 
+    type={{
+        type: {
+            type: 'string',
+            required: true
+        },
+        form: {
+            type: 'string',
+            required: true
+        }
+    }}
+/>
+
+### UserDictWordInput
+<TypeTable 
+    type={{
+        surface: {
+            type: 'string',
+            required: true
+        },
+        pronunciation: {
+            type: 'string',
+            required: true
+        },
+        accentType: {
+            type: 'number',
+            required: true,
+        },
+        wordType: {
+            type: 'UserDictWordType',
+            typeDescriptionLink: '#userdictwordtype'
+        },
+        priority: {
+            type: 'number'
+        }
+    }}
+/>
+
+### UserDictWord
+Only used as output.
+<TypeTable 
+    type={{
+        id: {
+            type: 'string',
+            required: true
+        },
+        surface: {
+            type: 'string',
+            required: true
+        },
+        pronunciation: {
+            type: 'string',
+            required: true
+        },
+        accentType: {
+            type: 'number',
+            required: true
+        },
+        accentAssociativeRule: {
+            type: 'string',
+            required: true
+        },
+        wordType: {
+            type: 'UserDictWordType',
+            required: true,
+            typeDescriptionLink: '#userdictwordtype'
+        },
+        priority: {
+            type: 'number',
+            required: true
+        },
+        inflection: {
+            type: 'UserDictWordInflection',
+            required: true,
+            typeDescriptionLink: '#userdictwordinflection'
+        },
+        stem: {
+            type: 'string',
+            required: true
+        },
+        yomi: {
+            type: 'string',
+            required: true
+        },
+        moraCount: {
+            type: 'number',
+            required: true
+        },
+        pos: {
+            type: '[string, string, string, string]',
+            required: true
+        },
+        contextId: {
+            type: 'number',
+            required: true
+        }
+    }}
+/>
+
+### UserDictWordType
+<TypeTable 
+    type={{
+        string: {
+            type: 'PROPER_NOUN | COMMON_NOUN | VERB | ADJECTIVE | SUFFIX',
+            required: true
+        }
+    }}
+/>
