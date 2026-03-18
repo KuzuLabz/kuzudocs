@@ -6,10 +6,12 @@ platforms: ['android', 'ios']
 
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { GithubInfo } from 'fumadocs-ui/components/github-info';
 
-<Callout title="Coming Soon" type="error">
-  Currently in the testing phase!
-</Callout>
+<GithubInfo
+  owner="KuzuLabz"
+  repo="react-native-nitro-voicevox"
+/>
 
 <Callout title="Android - 16KB Page Size" type="warn">
   16KB page size is not yet suppported. Once VOICEVOX Onnxruntime 1.23.2 is released, this package will be updated.
@@ -27,8 +29,7 @@ For more information, visit these links:
 - [Wiki Article](https://vocalsynth.fandom.com/wiki/VOICEVOX) (English)
 
 ## Install
-Coming soon!
-{/* ```bash tab="npm"
+```bash tab="npm"
 npm install @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
 ```
 
@@ -42,7 +43,7 @@ yarn add @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
 
 ```bash tab="bun"
 bun add @kuzulabz/react-native-nitro-voicevox react-native-nitro-modules
-``` */}
+```
 
 ## Usage
 ### Text-to-Speech
