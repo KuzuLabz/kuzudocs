@@ -1,0 +1,371 @@
+---
+title: Vibrato
+description: A React Native port of Vibrato, a tokenizer written in Rust.
+platforms: ['android', 'ios', 'web']
+---
+
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+import { GithubInfo } from 'fumadocs-ui/components/github-info';
+
+{/* <GithubInfo
+  owner="KuzuLabz"
+  repo="react-native-nitro-vibrato"
+/> */}
+
+An ultra-fast React Native port of Vibrato, a Viterbi-based accelerated Japanese morphological analyzer and tokenizer written in Rust.
+
+[Vibrato](https://github.com/daac-tools/vibrato) is brought to React Native via [Nitro Modules](https://nitro.margelo.com/).
+
+## Install
+
+```bash tab="npm"
+npm install @kuzulabz/react-native-nitro-vibrato react-native-nitro-modules
+```
+
+```bash tab="pnpm"
+pnpm add @kuzulabz/react-native-nitro-vibrato react-native-nitro-modules
+```
+
+```bash tab="yarn"
+yarn add @kuzulabz/react-native-nitro-vibrato react-native-nitro-modules
+```
+
+```bash tab="bun"
+bun add @kuzulabz/react-native-nitro-vibrato react-native-nitro-modules
+```
+
+## Usage
+<Steps>
+<Step>
+### Initialize
+```ts
+import { initWasmAsync, Vibrato, MecabPreset } from '@kuzulabz/react-native-nitro-vibrato';
+
+// Required for web! (safe to call on mobile)
+await initWasmAsync();
+
+// Minimal
+const path = 'file://.../system.dic';
+await Vibrato.initialize(path);
+
+// With user dictionary
+const userDict = 'file://.../user-dict.csv';
+await Vibrato.initialize(path, userDict);
+
+// With the Mecab Preset. 
+// This will return the same token results as Mecab.
+await Vibrato.initialize(path, userDict, MecabPreset);
+
+// With multiple files
+await Vibrato.initializeFromTextDic({
+    char: 'file://.../char.def',
+    lex: 'file://.../lex.csv',
+    matrix: 'file://.../matrix.def',
+    unk: 'file://.../unk.def'
+});
+```
+</Step>
+<Step>
+### Tokenize
+```ts
+import { Vibrato, Token } from '@kuzulabz/react-native-nitro-vibrato';
+
+// Returns tokens, each containing the surface, features, word cost, etc
+const result: Token[] = Vibrato.tokenize(text);
+```
+</Step>
+</Steps>
+
+## API Reference
+### Setup
+#### initialize
+Initializes Vibrato by loading the dictionary and creating a tokenizer.
+
+```ts
+await Vibrato.initialize("file://...");
+```
+<TypeTable 
+    type={{
+        dic: {
+            type: 'string | Uint8Array',
+            required: true,
+            description: 'The local uri of the dictionary ("file://.../system.dic") or a Uint8Array.'
+        },
+        userDic: {
+            type: 'string | Uint8Array',
+            required: false,
+            description: 'An optional user dictionary.'
+        },
+        config: {
+            type: 'InitializeOptions',
+            typeDescriptionLink: '#initializeoptions',
+            required: false,
+            description: "Optional dictionary settings. To get the same results as Mecab, pass the MecabPreset object."
+        }
+    }}
+/>
+
+#### initializeFromTextDic
+Initializes Vibrato by loading the dictionary and creating a tokenizer.
+
+```ts
+await Vibrato.initializeFromTextDic({
+    lex: lexUri,
+    matrix: matrixUri,
+    char: charUri,
+    unk: unkUri
+});
+```
+<TypeTable 
+    type={{
+        files: {
+            type: 'TextdictBytes | TextdictPaths',
+            typeDescriptionLink: '#textdictpaths',
+            required: true,
+        },
+        userDic: {
+            type: 'string | Uint8Array',
+            required: false,
+            description: 'An optional user dictionary.'
+        },
+        config: {
+            type: 'InitializeOptions',
+            typeDescriptionLink: '#initializeoptions',
+            required: false,
+            description: "Optional dictionary settings. To get the same results as Mecab, pass the MecabPreset object."
+        }
+    }}
+/>
+
+#### destroy
+Unloads the dictionary and destroys the tagger. Useful for changing dictionary or loading new user dictionaries.
+```ts
+Vibrato.destroy();
+```
+
+### Core
+#### tokenize
+Tokenize a japanese sentence.
+```ts
+const tokens = Vibrato.tokenize("すもももももももものうち");
+tokens[0].surface
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+        },
+        returns: { type: 'Token[]', required: true, typeDescriptionLink: '#token' }
+    }}
+/>
+
+#### wakati
+Segments/splits the japanese text by word. This is a `tokenize` wrapper and only returns the surfaces.
+```ts
+const words = Vibrato.wakati("すもももももももものうち");
+```
+<TypeTable 
+    type={{
+        text: {
+            type: 'string',
+            required: true,
+        },
+        returns: { type: 'string[]', required: true }
+    }}
+/>
+
+### Hooks
+#### useVibratoInitialized
+Returns the initialization status of the dictionary / tokenizer. 
+
+```ts
+import { useVibratoInitialized } from '@kuzulabz/react-native-nitro-vibrato';
+
+const isInit = useVibratoInitialized();
+
+```
+
+You can also get the initialization status manually by subscribing.
+
+```ts
+const [isInit, setIsInit] = useState(Vibrato.isInitialized);
+
+const unsubscribe = Vibrato.subscribe(setIsInit);
+```
+
+### Constants
+#### isInitialized
+Returns the initialization status
+
+### Utils
+#### compileDictionary
+Compile a system dictionary into a .dic file.
+
+```ts
+const dictionary = Vibrato.compileDictionary(
+    lex: lexUri,
+    matrix: matrixUri,
+    char: charUri,
+    unk: unkUri
+);
+file.write(dictionary);
+```
+<TypeTable 
+    type={{
+        files: {
+            type: 'TextdictBytes | TextdictPaths',
+            typeDescriptionLink: '#',
+            required: true,
+        },
+        returns: {
+            type: 'Uint8Array',
+            required: true,
+        }
+    }}
+/>
+
+#### MecabPreset
+An InitializeOptions preset for enabling Mecab results.
+
+```ts
+import { Vibrato, MecabPreset } from '@kuzulabz/react-native-nitro-vibrato';
+
+await Vibrato.initialize(path, undefined, MecabPreset);
+```
+
+<TypeTable
+  type={{
+    ignoreSpace: {
+        required: true,
+        type: 'boolean',
+        default: 'true'
+    },
+    maxGroupingLength: {
+        required: true,
+        type: 'number',
+        default: '24'
+    },
+  }}
+/>
+
+## Types
+### Token
+<TypeTable
+  type={{
+    surface: {
+      required: true,
+      type: 'string',
+      description: 'The original word.',
+    },
+    lexType: {
+        required: true,
+        type: 'string',
+    },
+    features: {
+        required: true,
+        type: 'string[]'
+    },
+    wordId: {
+        required: true,
+        type: 'number'
+    },
+    leftId: {
+        required: true,
+        type: 'number'
+    },
+    rightId: {
+        required: true,
+        type: 'number'
+    },
+    wordCost: {
+        required: true,
+        type: 'number'
+    },
+    totalCost: {
+        required: true,
+        type: 'number'
+    },
+  }}
+/>
+
+
+### TextdictPaths
+<TypeTable 
+    type={{
+        lex: {
+            required: true,
+            type: 'string'
+        },
+        matrix: {
+            required: true,
+            type: 'string'
+        },
+        char: {
+            required: true,
+            type: 'string'
+        },
+        unk: {
+            required: true,
+            type: 'string'
+        },
+    }}
+/>
+
+### TextdictBytes
+<TypeTable 
+    type={{
+        lex: {
+            required: true,
+            type: 'Uint8Array'
+        },
+        matrix: {
+            required: true,
+            type: 'Uint8Array'
+        },
+        char: {
+            required: true,
+            type: 'Uint8Array'
+        },
+        unk: {
+            required: true,
+            type: 'Uint8Array'
+        },
+    }}
+/>
+
+### InitializeOptions
+<TypeTable 
+    type={{
+        ignoreSpace: {
+            required: false,
+            type: 'boolean',
+            default: 'false',
+            typeDescription: 'Ignores spaces from tokens. This option is for compatibility with MeCab.'
+        },
+        maxGroupingLength: {
+            required: false,
+            type: 'number',
+            default: '0',
+            typeDescription: 'Specifies the maximum grouping length for unknown words. By default, the length is infinity.'
+        }
+    }}
+/>
+
+## ZSTD Support
+You can use .zst dictionaries by decompressing with [zstdify](https://github.com/bhouston/zstdify#readme).
+
+### Example
+```ts
+import { Vibrato } from '@kuzulabz/react-native-nitro-vibrato';
+import { decompress } from "zstdify";
+import { File, Paths } from 'expo-file-system';
+
+const compressedDic = new File(Paths.document, 'system.dic');
+const systemDic = decompressDic(await compressedDic.arrayBuffer());
+await Vibrato.initialize(systemDic);
+```
+
+## Dictionaries
+You can find Vibrato dictionaries at the official [Vibrato v5 release](https://github.com/daac-tools/vibrato/releases/tag/v0.5.0)
