@@ -1,16 +1,14 @@
 ---
 title: WaifuTagger
 description: A utility app that tags your images with danbooru tags - fully offline
-platforms: ['android', 'windows', 'mac']
+platforms: ['android', 'windows', 'mac', 'linux']
 icon: https://github.com/KuzuLabz/WaifuTagger/blob/master/assets/favicon.png?raw=true
 ---
 
 import Image from "next/image";
 import { GithubInfo } from 'fumadocs-ui/components/github-info';
 
-<Callout title="Coming Soon" type="info">
-  WaifuTagger will be on the Apple App Store soon!
-</Callout>
+
 
 <Image
   src="https://github.com/KuzuLabz/WaifuTagger/raw/master/banner.png"
@@ -19,13 +17,24 @@ import { GithubInfo } from 'fumadocs-ui/components/github-info';
   height={140}
 />
 
-Run SmilingWolfs [WD Convnext Tagger v3](https://huggingface.co/SmilingWolf/wd-convnext-tagger-v3) model on mobile and [WD SwinV2 Tagger v3](https://huggingface.co/p1atdev/wd-swinv2-tagger-v3-hf) on desktop!
+Run anime image classification models on mobile and desktop!
+
+## Features
+- 🗂️ Model manager - select from a range of models
+- 🏷️ Tag any image (anime, manga, real photos) with booru tags
+- 🔍 Discover what anime characters are in an image
+- 📝 Modify the tags output format (spaces, underscores, prompt)
+- ⭐ Leveling system based on image rankings 
+- 🔞 Detects if an image is explicit, questionable, sensitive, or safe
+- 🔗 Direct link to tag information
+- 🎨 UI theme colors based on input image
+- 🌐 Language support: English, Chinese, Japanese, Korean, French, German, Spanish 
 
 <iframe frameBorder="0" src="https://itch.io/embed/3793558?linkback=true&amp;bg_color=000000&amp;fg_color=eaeaea&amp;link_color=5bd1fa&amp;border_color=3c3c3c" width="552" height="167">
   <a href="https://kuzulabz.itch.io/waifutagger">WaifuTagger by KuzuLabz</a>
 </iframe>
 
-## Source Code
+## Source code
 <GithubInfo
   owner="KuzuLabz"
   repo="WaifuTagger"
