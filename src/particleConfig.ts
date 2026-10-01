@@ -1,6 +1,6 @@
-import { CollisionMode, DivType, InteractivityDetect, ISourceOptions, MoveDirection, OutMode, PixelMode } from "@tsparticles/engine";
+import { IOptions, MoveDirection, OutMode, PixelMode, RecursivePartial } from "@tsparticles/engine";
 
-export const config: ISourceOptions = {
+export const config: RecursivePartial<IOptions> = {
     "autoPlay": true,
     "background": {
         "color": {
@@ -23,7 +23,6 @@ export const config: ISourceOptions = {
     "duration": 0,
     "fpsLimit": 120,
     "interactivity": {
-        "detectsOn": InteractivityDetect.window,
         "events": {
             "onClick": {
                 "enable": true,
@@ -33,7 +32,7 @@ export const config: ISourceOptions = {
                 "selectors": [],
                 "enable": false,
                 "mode": [],
-                "type": DivType.circle
+                "type": 'circle'
             },
             "onHover": {
                 "enable": true,
@@ -173,7 +172,7 @@ export const config: ISourceOptions = {
             },
             "enable": false,
             "maxSpeed": 50,
-            "mode": CollisionMode.bounce,
+            "mode": 'bounce',
             "overlap": {
                 "enable": true,
                 "retries": 0
@@ -213,7 +212,6 @@ export const config: ISourceOptions = {
         },
         "effect": {
             "close": true,
-            "fill": true,
             "options": {},
             "type": []
         },
@@ -223,14 +221,14 @@ export const config: ISourceOptions = {
                 "offset": 0,
                 "value": 90
             },
-            "attract": {
-                "distance": 200,
-                "enable": false,
-                "rotate": {
-                    "x": 3000,
-                    "y": 3000
-                }
-            },
+            // "attract": {
+            //     "distance": 200,
+            //     "enable": false,
+            //     "rotate": {
+            //         "x": 3000,
+            //         "y": 3000
+            //     }
+            // },
             "center": {
                 "x": 50,
                 "y": 50,
@@ -271,11 +269,11 @@ export const config: ISourceOptions = {
                 "enable": false
             },
             "straight": false,
-            "trail": {
-                "enable": false,
-                "length": 10,
-                "fill": {}
-            },
+            // "trail": {
+            //     "enable": false,
+            //     "length": 10,
+            //     "fill": {}
+            // },
             "vibrate": false,
             "warp": false
         },
@@ -319,7 +317,7 @@ export const config: ISourceOptions = {
         },
         "shape": {
             "close": true,
-            "fill": true,
+            // "fill": true,
             "options": {
                 "image": [
                     {
