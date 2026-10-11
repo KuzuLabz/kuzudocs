@@ -1,0 +1,59 @@
+---
+title: NihongoRec
+description: A cross-platform Japanese character recognition app
+platforms: ['android', 'windows', 'mac', 'linux']
+icon: /docs/apps/NihongoRec/icon.png
+---
+
+import Image from "next/image";
+import { GithubInfo } from 'fumadocs-ui/components/github-info';
+import { MapIcon, GlobeIcon } from 'lucide-react';
+
+<Cards>
+  <Card
+    href="https://github.com/KuzuLabz/NihongoRec/releases/latest"
+    title="Downloads"
+    icon={<GlobeIcon />}
+  >
+    Available on Github
+  </Card>
+</Cards>
+
+<div style={{display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: 24}}>
+    <Image
+        src="/docs/apps/NihongoRec/screen1.png"
+        alt="Screenshot"
+        width={580}
+        height={570}
+    />
+    <Image
+        src="/docs/apps/NihongoRec/screen2.png"
+        alt="Screenshot"
+        width={270}
+        height={606}
+    />
+</div>
+
+A simple cross-platform Japanese character recognition app.
+
+## Features
+- 📝 Draw a Japanese character and get predictions
+- 🎨 UI theme customization
+- 🌐 Language support: English, Deutsch, Español, Français, Bahasa Indonesia, italiano, 日本語, 한국어, Português, Português (Brasil), Русский язык, Tiếng Việt, 简体中文, 繁體中文
+
+## Requirements
+### Windows
+The latest [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version) is required for onnxruntime inference. Without it, character predictions will not work. 
+
+## About
+I created this small app to learn Kotlin / Compose Multiplatform. As a React Native dev, this project did give me some headaches, but it was fun overall. It took me about 1-2 weeks to complete the app, mostly because I'm new to Kotlin and some documentation was either missing or difficult to find.
+
+### ONNX Model
+This app uses [Dariyooo](https://github.com/dariyooo)'s (DaAppLab) [DaKanji-Single-Kanji-Recognition](https://github.com/dariyooo/DaKanji-Single-Kanji-Recognition) onnx model. Please also check out their Japanese learning app: [DaKanji](https://github.com/dariyooo/DaKanji)!
+
+
+## Source code
+<GithubInfo
+  owner="KuzuLabz"
+  repo="NihongoRec"
+/>
